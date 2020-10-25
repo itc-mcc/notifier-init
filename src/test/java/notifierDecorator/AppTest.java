@@ -6,9 +6,55 @@ package notifierDecorator;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.junit.Before;
+
 public class AppTest {
-    @Test public void testAppHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
+
+    Notifier n;
+
+    @Before public void setUp()
+    {
+        n = new emailNotifier();
+    }
+
+    @Test public void testEmailNotifier() {
+        String notificacion;
+
+        notificacion = n.send("Se quema la casa!");
+
+        assertTrue(notificacion.equals("emailAlert:Se quema la casa!"));
+    }
+
+    @Test public void testEmailSMSNotifier() {
+        String notificacion;
+
+        n = new SMSDecorator(n);
+
+        notificacion = n.send("Se quema la casa!");
+
+        assertTrue(notificacion.equals("emailAlert:Se quema la casa!"+"\n"+"SMSAlert:Se quema la casa!"));
+    }
+
+    @Test public void testEmailSMSFacebookNotifier() {
+        String notificacion;
+
+        n = new SMSDecorator(n);
+        n = new FacebookDecorator(n);
+
+        notificacion = n.send("Se quema la casa!");
+
+        assertTrue(notificacion.equals("emailAlert:Se quema la casa!"+"\n"+"SMSAlert:Se quema la casa!"+"\n"+"FacebookAlert:Se quema la casa!"));
+    }
+
+    @Test public void testEmailSMSFacebooMSTeamskNotifier() {
+        String notificacion;
+
+        n = new SMSDecorator(n);
+        n = new FacebookDecorator(n);
+        n = new MSTeamsDecorator(n);
+
+        notificacion = n.send("Se quema la casa!");
+
+        assertTrue(notificacion.equals("emailAlert:Se quema la casa!"+"\n"+"SMSAlert:Se quema la casa!"+"\n"+"FacebookAlert:Se quema la casa!"+"\n"+"MSTeamsAlert:Se quema la casa!"));
     }
 }
